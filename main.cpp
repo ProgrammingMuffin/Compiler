@@ -6,9 +6,9 @@ std::fstream codefile;
 
 int main( )
 {
-    //std::string line;
-    /*OpenFile("test.sic");
-    while(!codefile.eof())
+    OpenFile("test.sic");
+    BufferCode();
+    /*while(!codefile.eof())
     {
         line = ReadSourceLine();
         std::cout<<"The line is: "<<line<<std::endl;

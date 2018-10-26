@@ -27,6 +27,7 @@ class Opcode_Table
     public:
         Opcode_Table(std::string op[], int opcode[], int n);
         Opcode_Table(){ }
+        int Search(std::string sym);
         void Display(void);
 };
 
@@ -35,9 +36,10 @@ extern Symbol_Table SYMTAB;
 extern Opcode_Table OPTAB;
 
 //void Scan();
-//void Tokenize();
+void Tokenize(std::string, std::string*, std::string*, std::string*);
 void AddDefaultSymbol(void);
 void OpenFile(std::string);
+void BufferCode();
 std::string ReadSourceLine();
 
 #endif // ASSEMBLE_H_INCLUDED

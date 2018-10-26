@@ -2,23 +2,55 @@
 #include<fstream>
 #include "assemble.h"
 
-int opcodes[5] = {
+int opcodes[21] = {
 
-    1,
-    2,
-    3,
+    24,
+    64,
+    40,
+    36,
+    48,
+    52,
+    56,
+    72,
+    0,
+    104,
+    80,
     4,
-    5
+    32,
+    68,
+    76,
+    12,
+    120,
+    84,
+    16,
+    28,
+    44
 
 };
 
-std::string ops[5] = {
+std::string ops[21] = {
 
     "ADD",
-    "ADDX",
-    "MOV",
+    "AND",
+    "COMP",
+    "DIV",
+    "JEQ",
+    "JGT",
+    "JLT",
+    "JSUB",
+    "LDA",
+    "LDB",
+    "LDCH",
+    "LDX",
+    "MUL",
+    "OR",
+    "RSUB",
     "STA",
-    "LDA"
+    "STB",
+    "STCH",
+    "STX",
+    "SUB",
+    "TIX"
 
 };
 
@@ -28,6 +60,51 @@ Opcode_Table OPTAB(ops, opcodes, 5);
 void OpenFile(std::string file_name)
 {
     codefile.open(file_name.c_str(), std::ios::in);
+}
+
+void Tokenize(std::string line, std::string *label, std::string *mnem, std::string *arg)
+{
+    int i;
+    for(i=0;i<(int)line.length() && line[i]!=' ';i++)
+    {
+        label->push_back(line[i]);
+    }
+    if(OPTAB.Search(*label) >= 0)
+    {
+        mnem = label;
+        i++;
+        while(i<(int)line.length() && line[i]!=',')
+            arg->push_back(line[i++]);
+        if(line[i]==',')
+        {
+            i++;
+            while(i<(int)line.length())
+                mnem->push_back(line[i]);
+        }
+    }
+    else
+    {
+        i++;
+        while(i<(int)line.length() && line[i]!=' ')
+            mnem->push_back(line[i++]);
+        i++;
+        while(i<(int)line.length() && line[i]!=',')
+            arg->push_back(line[i++]);
+        if(line[i]==',')
+        {
+            i++;
+            while(i<(int)line.length())
+                mnem->push_back(line[i]);
+        }
+    }
+}
+
+void BufferCode()
+{
+    std::string mnem, label, arg;
+    std::string line = ReadSourceLine();
+    Tokenize(line, &label, &mnem, &arg);
+    std::cout<<"Line is: "<<label<<"\t"<<mnem<<"\t"<<arg<<std::endl;
 }
 
 /*void Scan(std::string line)
@@ -68,7 +145,7 @@ void Symbol_Table::Display()
     for(i=0;i<=top;i++)
     {
         //symbol[i] = "HAHAHAA";
-        std::cout<<"Entry "<<i+1<<":\tSymbol: "<<symbol[i]<<"\tValue: "<<value[i]<<"\tRange: "<<range[i]<<std::endl;
+        //std::cout<<"Entry "<<i+1<<":\tSymbol: "<<symbol[i]<<"\tValue: "<<value[i]<<"\tRange: "<<range[i]<<std::endl;
     }
 }
 
@@ -92,9 +169,20 @@ Opcode_Table::Opcode_Table(std::string op[], int opcode[], int n)
 void Opcode_Table::Display(void)
 {
     int i;
-    std::cout<<"\n\tDisplaying all values inside OPTAB\n\n"<<std::endl;
+    //std::cout<<"\n\tDisplaying all values inside OPTAB\n\n"<<std::endl;
     for(i=0;i<this->optab_size;i++)
     {
-        std::cout<<"Entry "<<i+1<<": "<<op[i]<<"\t"<<opcode[i]<<std::endl;
+        //std::cout<<"Entry "<<i+1<<": "<<op[i]<<"\t"<<opcode[i]<<std::endl;
     }
+}
+
+int Opcode_Table::Search(std::string sym)
+{
+    int i, pos=-1;
+    for(i=0;i<optab_size;i++)
+    {
+        if(this->op[i]==sym)
+            pos = i;
+    }
+    return pos;
 }
