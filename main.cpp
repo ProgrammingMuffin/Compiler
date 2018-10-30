@@ -10,7 +10,7 @@ int main( )
     BufferCode();
     /*while(!codefile.eof())
     {
-        line = ReadSourceLine();
+        std::string line = ReadSourceLine();
         std::cout<<"The line is: "<<line<<std::endl;
     }*/
     OPTAB.Display();

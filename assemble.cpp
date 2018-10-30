@@ -64,14 +64,20 @@ void OpenFile(std::string file_name)
 
 void Tokenize(std::string line, std::string *label, std::string *mnem, std::string *arg)
 {
-    int i;
+    int i,j;
+    j=0;
+    mnem->clear();
+    label->clear();
+    arg->clear();
     for(i=0;i<(int)line.length() && line[i]!=' ';i++)
     {
         label->push_back(line[i]);
     }
     if(OPTAB.Search(*label) >= 0)
     {
-        mnem = label;
+        for(j=0;j<(int)line.length() && line[j]!=' ';j++)
+            mnem->push_back(line[j]);
+        label->clear();
         i++;
         while(i<(int)line.length() && line[i]!=',')
             arg->push_back(line[i++]);
@@ -79,7 +85,7 @@ void Tokenize(std::string line, std::string *label, std::string *mnem, std::stri
         {
             i++;
             while(i<(int)line.length())
-                mnem->push_back(line[i]);
+                mnem->push_back(line[i++]);
         }
     }
     else
@@ -94,7 +100,7 @@ void Tokenize(std::string line, std::string *label, std::string *mnem, std::stri
         {
             i++;
             while(i<(int)line.length())
-                mnem->push_back(line[i]);
+                mnem->push_back(line[i++]);
         }
     }
 }
@@ -102,9 +108,13 @@ void Tokenize(std::string line, std::string *label, std::string *mnem, std::stri
 void BufferCode()
 {
     std::string mnem, label, arg;
-    std::string line = ReadSourceLine();
-    Tokenize(line, &label, &mnem, &arg);
-    std::cout<<"Line is: "<<label<<"\t"<<mnem<<"\t"<<arg<<std::endl;
+    std::string line;
+    while(!codefile.eof())
+    {
+        line = ReadSourceLine();
+        Tokenize(line, &label, &mnem, &arg);
+        std::cout<<"Line is: Label: "<<label<<"\tMnemonic: "<<mnem<<"\tArgument: "<<arg<<std::endl;
+    }
 }
 
 /*void Scan(std::string line)
