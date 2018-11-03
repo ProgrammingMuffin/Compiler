@@ -3,7 +3,7 @@
 #include<string>
 #include "assemble.h"
 
-int opcodes[21] = {
+unsigned int opcodes[21] = {
 
     24,
     64,
@@ -82,13 +82,15 @@ void Pass1()
                 //do some stunts
                 if(mnem == "RESW")
                 {
-                    SYMTAB.Push(label, SegThresh + DLOCCTR, std::stoi(arg), 1);
-                    DLOCCTR += 1;
+                    SYMTAB.Push(label, (SegThresh + DLOCCTR), stoi(arg), 1);
+                    std::cout<<"RESW: "<<label<<"\tDLOCCTR: "<<DLOCCTR<<std::endl;
+                    DLOCCTR += stoi(arg);
                 }
                 else if(mnem == "RESB")
                 {
-                    SYMTAB.Push(label, SegThresh + DLOCCTR, std::stoi(arg), 2);
-                    DLOCCTR += 2;
+                    SYMTAB.Push(label, SegThresh + DLOCCTR, stoi(arg), 2);
+                    std::cout<<"RESB: "<<label<<"\tDLOCCTR: "<<DLOCCTR<<std::endl;
+                    DLOCCTR += stoi(arg);
                 }
             }
             else if(mnem == "END")
@@ -122,7 +124,10 @@ void Pass2()
             if(mnem_pos >= 0)
             {
                 arg_pos = SYMTAB.Search(arg);
-
+                obj.arg = SYMTAB.GetValue(arg_pos);
+                obj.mnem = OPTAB.GetOpcode(mnem_pos);
+                std::cout<<"Mnem: "<<mnem<<"\tArg: "<<arg<<std::endl;
+                std::cout<<"Object code: "<<obj.mnem<<"-"<<obj.arg<<std::endl;
             }
         }
     }
@@ -182,7 +187,7 @@ std::string ReadSourceLine()
     return line;
 }
 
-void Symbol_Table::Push(std::string sym, int loc, int s, int dtype=0)
+void Symbol_Table::Push(std::string sym, int loc, int s, int dtype)
 {
     top++;
     symbol[top] = sym;
@@ -235,7 +240,7 @@ void AddDefaultSymbol(void)
     std::cout<<"Jesus Christ"<<std::endl;
 }
 
-Opcode_Table::Opcode_Table(std::string op[], int opcode[], int n)
+Opcode_Table::Opcode_Table(std::string op[], unsigned int opcode[], int n)
 {
     int i;
     this->optab_size = n;
@@ -244,6 +249,11 @@ Opcode_Table::Opcode_Table(std::string op[], int opcode[], int n)
         this->op[i] = op[i];
         this->opcode[i] = opcode[i];
     }
+}
+
+unsigned int Opcode_Table::GetOpcode(int pos)
+{
+    return this->opcode[pos];
 }
 
 void Opcode_Table::Display(void)
@@ -265,4 +275,18 @@ int Opcode_Table::Search(std::string sym)
             pos = i;
     }
     return pos;
+}
+
+long int stoi(std::string s)
+{
+    long int i;
+    int j;
+    i = 0;
+    j = 0;
+    while(s[j] >= '0' && s[j] <= '9')
+    {
+        i = i * 10 + (s[j] - '0');
+        j++;
+    }
+    return i;
 }

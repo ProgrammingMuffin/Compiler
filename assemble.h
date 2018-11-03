@@ -25,21 +25,22 @@ class Symbol_Table
 
 class Opcode_Table
 {
-    std::string op[18];
-    int opcode[18];
+    std::string op[21];
+    unsigned int opcode[21];
     int optab_size;
     public:
-        Opcode_Table(std::string op[], int opcode[], int n);
+        Opcode_Table(std::string op[], unsigned int opcode[], int n);
         Opcode_Table(){ }
         int Search(std::string sym);
+        unsigned int GetOpcode(int pos);
         void Display(void);
 };
 
 class OBJECTCODE
 {
     public:
-        unsigned char mnem;
-        unsigned long int arg;
+        unsigned int mnem;
+        int arg;
 };
 
 extern std::fstream codefile;
@@ -49,9 +50,11 @@ extern unsigned long int LOCCTR;
 
 //void Scan();
 void Tokenize(std::string, std::string*, std::string*, std::string*);
+long int stoi(std::string);
 void AddDefaultSymbol(void);
 void OpenFile(std::string);
-void BufferCode();
+void Pass1();
+void Pass2();
 std::string ReadSourceLine();
 
 #endif // ASSEMBLE_H_INCLUDED

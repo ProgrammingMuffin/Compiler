@@ -7,12 +7,13 @@ std::fstream codefile;
 int main( )
 {
     OpenFile("test.sic");
-    BufferCode();
+    Pass1();
+    Pass2();
     /*while(!codefile.eof())
     {
         std::string line = ReadSourceLine();
         std::cout<<"The line is: "<<line<<std::endl;
     }*/
-    OPTAB.Display();
+    //OPTAB.Display();
     return 0;
 }
