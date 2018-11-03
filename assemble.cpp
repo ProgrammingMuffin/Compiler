@@ -1,5 +1,6 @@
 #include<iostream>
 #include<fstream>
+#include<string>
 #include "assemble.h"
 
 int opcodes[21] = {
@@ -55,11 +56,76 @@ std::string ops[21] = {
 };
 
 Symbol_Table SYMTAB;
-Opcode_Table OPTAB(ops, opcodes, 5);
+Opcode_Table OPTAB(ops, opcodes, 21);
+unsigned long int LOCCTR = 0; //Code segment LOCCTR.
+unsigned long int DLOCCTR = 0; //Data segment LOCCTR.
+unsigned long int SegThresh = 1000000;
 
 void OpenFile(std::string file_name)
 {
     codefile.open(file_name.c_str(), std::ios::in);
+}
+
+void Pass1()
+{
+    std::string mnem, label, arg;
+    std::string line;
+    while(!codefile.eof())
+    {
+        line = ReadSourceLine();
+        Tokenize(line, &label, &mnem, &arg);
+        std::cout<<"Line is: Label: "<<label<<"\tMnemonic: "<<mnem<<"\tArgument: "<<arg<<std::endl;
+        if(label.empty() == false)
+        {
+            if(mnem == "RESW" || mnem == "RESB")
+            {
+                //do some stunts
+                if(mnem == "RESW")
+                {
+                    SYMTAB.Push(label, SegThresh + DLOCCTR, std::stoi(arg), 1);
+                    DLOCCTR += 1;
+                }
+                else if(mnem == "RESB")
+                {
+                    SYMTAB.Push(label, SegThresh + DLOCCTR, std::stoi(arg), 2);
+                    DLOCCTR += 2;
+                }
+            }
+            else if(mnem == "END")
+            {
+                return;
+            }
+            else
+            {
+                SYMTAB.Push(label, LOCCTR, 0);
+            }
+        }
+        LOCCTR++;
+    }
+}
+
+void Pass2()
+{
+    std::string label, mnem, arg;
+    std::string line;
+    OBJECTCODE obj;
+    int mnem_pos, arg_pos;
+    codefile.clear();
+    codefile.seekg(0, std::ios::beg);
+    while(!codefile.eof())
+    {
+        line = ReadSourceLine();
+        Tokenize(line, &label, &mnem, &arg);
+        if(mnem != "END" && mnem != "START" && mnem != "RESW" && mnem != "RESB")
+        {
+            mnem_pos = OPTAB.Search(mnem);
+            if(mnem_pos >= 0)
+            {
+                arg_pos = SYMTAB.Search(arg);
+
+            }
+        }
+    }
 }
 
 void Tokenize(std::string line, std::string *label, std::string *mnem, std::string *arg)
@@ -105,18 +171,6 @@ void Tokenize(std::string line, std::string *label, std::string *mnem, std::stri
     }
 }
 
-void BufferCode()
-{
-    std::string mnem, label, arg;
-    std::string line;
-    while(!codefile.eof())
-    {
-        line = ReadSourceLine();
-        Tokenize(line, &label, &mnem, &arg);
-        std::cout<<"Line is: Label: "<<label<<"\tMnemonic: "<<mnem<<"\tArgument: "<<arg<<std::endl;
-    }
-}
-
 /*void Scan(std::string line)
 {
 }
@@ -128,12 +182,13 @@ std::string ReadSourceLine()
     return line;
 }
 
-void Symbol_Table::Push(std::string sym, int loc, int s)
+void Symbol_Table::Push(std::string sym, int loc, int s, int dtype=0)
 {
     top++;
     symbol[top] = sym;
     value[top] = loc;
     range[top] = s;
+    type[top] = dtype;
 }
 
 int Symbol_Table::Search(std::string sym)
@@ -157,6 +212,21 @@ void Symbol_Table::Display()
         //symbol[i] = "HAHAHAA";
         //std::cout<<"Entry "<<i+1<<":\tSymbol: "<<symbol[i]<<"\tValue: "<<value[i]<<"\tRange: "<<range[i]<<std::endl;
     }
+}
+
+int Symbol_Table::GetValue(int pos)
+{
+    return value[pos];
+}
+
+int Symbol_Table::GetType(int pos)
+{
+    return type[pos];
+}
+
+int Symbol_Table::GetRange(int pos)
+{
+    return range[pos];
 }
 
 void AddDefaultSymbol(void)
