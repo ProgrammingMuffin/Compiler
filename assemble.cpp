@@ -63,7 +63,18 @@ unsigned long int SegThresh = 1000000;
 
 void OpenFile(std::string file_name)
 {
+    int i;
     codefile.open(file_name.c_str(), std::ios::in);
+    i = (int)file_name.size() - 3;
+    file_name[i++] = 'o';
+    file_name[i++] = 'b';
+    file_name[i++] = 'j';
+    objfile.open(file_name.c_str(), std::ios::out | std::ios::binary);
+}
+
+void PushObj(OBJECTCODE obj)
+{
+    objfile.write((char*)&obj, sizeof(obj));
 }
 
 void Pass1()
@@ -74,7 +85,7 @@ void Pass1()
     {
         line = ReadSourceLine();
         Tokenize(line, &label, &mnem, &arg);
-        std::cout<<"Line is: Label: "<<label<<"\tMnemonic: "<<mnem<<"\tArgument: "<<arg<<std::endl;
+        //std::cout<<"Line is: Label: "<<label<<"\tMnemonic: "<<mnem<<"\tArgument: "<<arg<<std::endl;
         if(label.empty() == false)
         {
             if(mnem == "RESW" || mnem == "RESB")
@@ -83,13 +94,13 @@ void Pass1()
                 if(mnem == "RESW")
                 {
                     SYMTAB.Push(label, (SegThresh + DLOCCTR), stoi(arg), 1);
-                    std::cout<<"RESW: "<<label<<"\tDLOCCTR: "<<DLOCCTR<<std::endl;
+                    //std::cout<<"RESW: "<<label<<"\tDLOCCTR: "<<DLOCCTR<<std::endl;
                     DLOCCTR += stoi(arg);
                 }
                 else if(mnem == "RESB")
                 {
                     SYMTAB.Push(label, SegThresh + DLOCCTR, stoi(arg), 2);
-                    std::cout<<"RESB: "<<label<<"\tDLOCCTR: "<<DLOCCTR<<std::endl;
+                    //std::cout<<"RESB: "<<label<<"\tDLOCCTR: "<<DLOCCTR<<std::endl;
                     DLOCCTR += stoi(arg);
                 }
             }
@@ -126,11 +137,14 @@ void Pass2()
                 arg_pos = SYMTAB.Search(arg);
                 obj.arg = SYMTAB.GetValue(arg_pos);
                 obj.mnem = OPTAB.GetOpcode(mnem_pos);
-                std::cout<<"Mnem: "<<mnem<<"\tArg: "<<arg<<std::endl;
+                PushObj(obj);
+                //std::cout<<"Mnem: "<<mnem<<"\tArg: "<<arg<<std::endl;
                 std::cout<<"Object code: "<<obj.mnem<<"-"<<obj.arg<<std::endl;
             }
         }
     }
+    codefile.close();
+    objfile.close();
 }
 
 void Tokenize(std::string line, std::string *label, std::string *mnem, std::string *arg)

@@ -44,6 +44,7 @@ class OBJECTCODE
 };
 
 extern std::fstream codefile;
+extern std::ofstream objfile;
 extern Symbol_Table SYMTAB;
 extern Opcode_Table OPTAB;
 extern unsigned long int LOCCTR;
