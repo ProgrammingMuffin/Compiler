@@ -48,6 +48,7 @@ extern std::ofstream objfile;
 extern Symbol_Table SYMTAB;
 extern Opcode_Table OPTAB;
 extern unsigned long int LOCCTR;
+extern unsigned long int SegThresh;
 
 //void Scan();
 void Tokenize(std::string, std::string*, std::string*, std::string*);

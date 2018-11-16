@@ -1,18 +1,38 @@
 #include<iostream>
 #include<fstream>
-#include "assemble.h"
 #include "loader.h"
+#include "assemble.h"
+#include "CEE.h"
+#include "parser.h"
 
 std::fstream codefile;
 std::ofstream objfile;
+ARITH a;
+unsigned int CMEM[200], ACC, IR[2];
+unsigned long int LEN=0;
+int PC, AMEM[200], DMEM[200];
+int CMEM_ptr = 0, AMEM_ptr = 0, DMEM_ptr = 0;
 
 int main( )
 {
+    int x[6] = {8, 5, 6, 5, 10};//{5, 6, 5, 7, 5, 10};
+    unsigned long int temp;
     OpenFile("test.sic");
     Pass1();
     Pass2();
-    std::cout<<"\nFrom loaded file: \n"<<std::endl;
+    //std::cout<<"\nFrom loaded file: \n"<<std::endl;
     LoadProgram("test.obj");
+    PrintMemory();
+    temp = LEN;
+    std::cout<<"LEN value is: "<<LEN<<std::endl;
+    while(temp)
+    {
+        temp--;
+        Fetch();
+        Execute();
+        PrintMemory();
+    }
+    //a.Parse(x);
     /*while(!codefile.eof())
     {
         std::string line = ReadSourceLine();
