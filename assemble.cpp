@@ -228,7 +228,6 @@ void Symbol_Table::Display()
     int i;
     for(i=0;i<=top;i++)
     {
-        //symbol[i] = "HAHAHAA";
         //std::cout<<"Entry "<<i+1<<":\tSymbol: "<<symbol[i]<<"\tValue: "<<value[i]<<"\tRange: "<<range[i]<<std::endl;
     }
 }
