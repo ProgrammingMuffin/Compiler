@@ -1,6 +1,11 @@
 #include "parser.h"
 #include<iostream>
 
+LEXTOKEN Tokstack[20];
+int toktop = -1;
+int read_num = 0;
+char char_map[12] = {'e', 'E', 't', 'T', 'f', 'i', '+', '*', '(', ')', '$'};
+
 void ARITH::Parse(int input_str[])
 {
     char char_map[12] = {'e', 'E', 't', 'T', 'f', 'i', '+', '*', '(', ')', '$'};
@@ -86,9 +91,15 @@ void ARITH::Parse(int input_str[])
         {
             //MATCH()
             std::cout<<"\nMATCH("<<char_map[STACK[top]]<<")"<<std::endl;
+            Tokstack[++toktop].id = STACK[top];
+            read_num++;
             //std::cout<<"STACK IS: "<<std::endl;
             iptr++;
             top--;
+            if(read_num == 3)
+            {
+                SortStack();
+            }
             /*for(int j=0;j<=top;j++)
                 std::cout<<STACK[j]<<" ";
             std::cout<<"\nInput stream: "<<std::endl;
@@ -118,4 +129,29 @@ void ARITH::Parse(int input_str[])
         {
         }
     }
+}
+
+void SortStack(void)
+{
+    int i, j;
+    LEXTOKEN temp;
+    read_num = 0;
+    /*for(i=0;i<=toktop;i++)
+    {
+        for(j=0;j<=(toktop-i-1);j++)
+        {
+            if(Tokstack[j].pri > Tokstack[j+1].pri)
+            {
+                temp = Tokstack[j];
+                Tokstack[j] = Tokstack[j+1];
+                Tokstack[j+1] = temp;
+            }
+        }
+    }*/
+    std::cout<<"\n\tPriority sorted tok stack is: "<<std::endl;
+    for(i=0;i<=toktop;i++)
+    {
+        std::cout<<"\t"<<char_map[Tokstack[i].id];
+    }
+    std::cout<<std::endl;
 }

@@ -251,7 +251,6 @@ int Symbol_Table::GetRange(int pos)
 void AddDefaultSymbol(void)
 {
     SYMTAB.Push("Hello World", 6860112, 98);
-    std::cout<<"Jesus Christ"<<std::endl;
 }
 
 Opcode_Table::Opcode_Table(std::string op[], unsigned int opcode[], int n)
